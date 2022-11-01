@@ -1,10 +1,14 @@
 
+#include "math.h"
+#include "vector.h"
+#include "vector4.h"
+
 struct FMatrix
 {
     union 
     {
         float M[4][4];
-    }
+    };
 
 
 public:
@@ -19,7 +23,7 @@ public:
     inline FMatrix operator*(float Scale) const;
     inline void operator*=(float Scale);
 
-    inline bool operator ==() const;
+    inline bool operator ==(const FMatrix& Other) const;
 
 public:
     inline FVector4 TransformVector(const FVector4& V) const;
@@ -38,7 +42,7 @@ public:
     inline FMatrix ApplyScale(float Scale) const;
     inline FVector GetScale() const;
 
-    inline FVector GetTranslation() const;342
+    inline FVector GetTranslation() const;
     inline void SetTranslation(const FVector& Position);
 
     inline FVector GetAxis(int32 Axis);
@@ -65,7 +69,7 @@ inline FMatrix::FMatrix(const FVector& XAxis, const FVector& YAxis, const FVecto
     M[3][0] = WAxis.X; M[3][1] = WAxis.Y; M[3][2] = WAxis.Z; M[3][3] = 0;
 }
 
-inline FMatrix::SetIndentity()
+inline void FMatrix::SetIndentity()
 {
     M[0][0] = 1; M[0][1] = 0; M[0][2] = 0; M[0][3] = 0;
     M[1][0] = 0; M[1][1] = 1; M[1][2] = 0; M[1][3] = 0;
@@ -87,7 +91,7 @@ inline FMatrix FMatrix::operator*(float Scale) const
         }
     }
 
-    return Reuslt;
+    return Result;
 }
 
 inline void FMatrix::operator*=(float Scale)
@@ -101,7 +105,7 @@ inline void FMatrix::operator*=(float Scale)
     }
 }
 
-inline static void FMatrix::MatrixMultipy(FMatrix& Result, const FMatrix& A, const FMatrix& B)
+inline void FMatrix::MatrixMultipy(FMatrix& Result, const FMatrix& A, const FMatrix& B)
 {
     Result.M[0][0] = A.M[0][0] * B.M[0][0] + A.M[0][1] * B.M[1][0] + A.M[0][2] * B.M[2][0] + A.M[0][3] * B.M[3][0];       
     Result.M[0][1] = A.M[0][0] * B.M[0][1] + A.M[0][1] * B.M[1][1] + A.M[0][2] * B.M[2][1] + A.M[0][3] * B.M[3][1];       
@@ -150,7 +154,7 @@ inline void FMatrix::MatrixInverse(FMatrix& Result, const FMatrix& SrcMatrix)
     typedef float Float4x4[4][4];
     float Det[4];
 
-    cosnt Float4x4& M = *((const Float4x4*)SrcMatrix);
+    const Float4x4& M = *((const Float4x4*)SrcMatrix);
 
     float m00 = M[2][2] * M[3][3] - M[2][3] * M[3][2];
     float m01 = M[1][2] * M[3][3] - M[1][3] * M[3][2];
@@ -197,7 +201,7 @@ inline void FMatrix::MatrixInverse(FMatrix& Result, const FMatrix& SrcMatrix)
     Result.M[3][3] =  RDet * (M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]) - M[1][0] * (M[0][1] * M[2][2] - M[0][2] * M[2][1]) +  M[2][0] * (M[0][1] * M[1][2] - M[0][2] * M[1][1]));
 }
 
-inline static void FMatrix::MatrixTransformVector(FVector4& Result, const FVector4& V, const FMatrix& M)
+inline void FMatrix::MatrixTransformVector(FVector4& Result, const FVector4& V, const FMatrix& M)
 {
     Result.X = M.M[0][0] * V.X + M.M[1][0] * V.Y + M.M[2][0] * V.Z + M.M[3][3] * V.W;
     Result.Y = M.M[0][1] * V.X + M.M[1][1] * V.Y + M.M[2][1] * V.Z + M.M[3][3] * V.W;

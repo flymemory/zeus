@@ -1,3 +1,5 @@
+#include "math.h"
+
 struct FVector
  {
     /** X Component of Vector. */
@@ -27,6 +29,11 @@ public:
      */
     inline FVector  operator^(const FVector& V) const; 
 
+    inline FVector  operator+(const FVector& V) const;
+    inline FVector  operator-(const FVector& V) const;
+    inline FVector  operator*(float V) const;
+    inline FVector  operator/(float V) const;
+
     /**
      * @brief Normailize this vector.
      * 
@@ -54,6 +61,9 @@ public:
      * @return The squared length of this vector. 
      */
     inline float SizeSquared() const;
+
+    inline static float Distance(const FVector& A, const FVector& B);
+    inline static float DistanceSquared(const FVector& A, const FVector& B);
 
     /**
      * @brief Calculate dot product of two vectors.
@@ -122,7 +132,7 @@ public:
      * @return true Intersection exists.
      * @return false Intersection not exists.
      */
-    static bool    LineSphereIntersection(const FVector& PointStart, const FVector& PointEnd, const FVector& Origin, float Radius, FVector *Result1, FVector *Result2);
+    static bool    LineSphereIntersection(const FVector& PointStart, const FVector& PointEnd, const FVector& Origin, float Radius, float *const Result1, float *const Result2);
 };
 
 inline FVector::FVector()
@@ -155,6 +165,43 @@ inline FVector FVector::operator^(const FVector& V) const
     );
 }
 
+inline FVector  FVector::operator+(const FVector& V) const
+{
+    return FVector(
+        X + V.X, 
+        Y + V.Y,
+        Z + V.Z
+    );
+}
+
+inline FVector  FVector::operator-(const FVector& V) const
+{
+    return FVector(
+        X - V.X, 
+        Y - V.Y,
+        Z - V.Z
+    );
+}
+    
+inline FVector  FVector::operator*(float V) const
+{
+     return FVector(
+        X * V, 
+        Y * V,
+        Z * V
+    );   
+}
+
+inline FVector  FVector::operator/(float V) const
+{
+    return FVector(
+        X / V, 
+        Y / V,
+        Z / V
+    );
+}
+
+
 inline FVector FVector::CrossProduct(const FVector& A, const FVector& B)
 {
     return A^B;
@@ -162,17 +209,17 @@ inline FVector FVector::CrossProduct(const FVector& A, const FVector& B)
 
 inline float FVector::Size() const
 {
-    return Sqrt(X*X + Y*Y + Z*Z);
+    return FMath::Sqrt(X*X + Y*Y + Z*Z);
 }
 
-inline float FVetor::SizeSquared() const
+inline float FVector::SizeSquared() const
 {
     return X*X + Y*Y + Z*Z;
 }
 
 inline float FVector::Distance(const FVector& A, const FVector& B)
 {
-    return FVector::DistanceSquared(A, B);
+    return FMath::Sqrt(FVector::DistanceSquared(A, B));
 }
 
 inline float FVector::DistanceSquared(const FVector& A, const FVector& B)
@@ -201,12 +248,11 @@ inline bool FVector::ToLeft(const FVector& pointToTest)
     return false;
 }
 
-
 FVector FVector::LinePlaneIntersection(const FVector& PointStart, const FVector& PointEnd, const FVector& PlaneOrigin, const FVector& PlaneNormal)
 {
     FVector LineDirection = PointEnd - PointStart;
 
-    return PointStart + LineDirection * ((PlaneOrigin-PointStart)|PlaneNormal) / (PlaneNormal|LineDirection)); 
+    return PointStart + LineDirection * ((PlaneOrigin - PointStart) | PlaneNormal) / (PlaneNormal | LineDirection); 
 }
 
 bool FVector::LineSphereIntersection(const FVector&PointStart, const FVector& PointEnd, const FVector& Origin, float Radius, float *const Result1, float *const Result2)
@@ -215,20 +261,20 @@ bool FVector::LineSphereIntersection(const FVector&PointStart, const FVector& Po
     FVector PO = PointStart  - Origin;
 
     float a = LineNormal | LineNormal;
-    float b = 2 * PO | LineNormal;
-    float c = PO | PO - Radius * Radius;
+    float b = (PO * 2.0f) | LineNormal;
+    float c = (PO | PO) - Radius * Radius;
 
-    B = b * b - 4 * a * c;
+    float B = b * b - 4 * a * c;
 
-    if (fabs(a) == 0 || B < 0)
+    if (FMath::Abs(a) == 0 || B < 0)
     {
         return false;
     }
 
     if (Result1 != nullptr)
-        *Result1 = (-b + Sqrt(B)) / (2 * a);
+        *Result1 = (-b + FMath::Sqrt(B)) / (2 * a);
     if (Result2 != nullptr)
-        *Result1 = (-b - Sqrt(B)) / (2 * a);
+        *Result1 = (-b - FMath::Sqrt(B)) / (2 * a);
 
     return true;
 }

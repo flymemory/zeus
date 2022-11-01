@@ -7,33 +7,33 @@
 #define FLT_TOLERANCE_SMALL (1.e-4f)
 #define FLT_MAX             (3.402823466e+38F)
 
-typedef signed char         int8
-typedef unsigned char       uint8
-typedef signed short int    int16
-typedef unsigned short int  uint16
-typedef signed int          int32
-typedef unsigned int        uint32
-typedef signed long long    int64
-typedef usiigned long long  uint64
+typedef signed char         int8;
+typedef unsigned char       uint8;
+typedef signed short int    int16;
+typedef unsigned short int  uint16;
+typedef signed int          int32;
+typedef unsigned int        uint32;
+typedef signed long long    int64;
+typedef unsigned long long  uint64;
 
-namespace FMath
+struct FMath
 {
 
-    static inline IsEqual(float A, float B);
-    static inline IsEqual(double A, float B);
-    static inline IsZero(float A);
+    static inline bool IsEqual(float A, float B);
+    static inline bool IsEqual(double A, float B);
+    static inline bool IsZero(float A);
 
-    static inline TruncToInt(float F)
+    static inline int32 TruncToInt(float F)
     {
         return (int32)F;
     }
     
-    static inline TruncToFloat(float F)
+    static inline float TruncToFloat(float F)
     {
         return truncf(F);
     }
 
-    static inline TruncToDouble(doulbe F)
+    static inline double TruncToDouble(double F)
     {
         return trunc(F);
     }
@@ -192,4 +192,4 @@ namespace FMath
     inline auto DegreesToRadians(T const& Vaule);
 
     static float SmoothStep(float A, float B, float X);
-}
+};
