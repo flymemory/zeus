@@ -223,3 +223,15 @@ inline FVector4 FMatrix::TransformVector(const FVector& V) const
 {
     return TransformVector(FVector4(V, 0.0f));
 }
+
+inline FVector4 FMatrix::InverseTransformVector(const FVector& V) const
+{
+    FMatrix InverseMatrix = FMatrix::Inverse();
+    return InverseMatrix.TransformVector(V);
+}
+
+inline FVector4 FMatrix::InverseTransfromPosition(const FVector& V) const
+{
+    FMatrix InverseMatrix = FMatrix::Inverse();
+    return InverseMatrix.TransformPosition(V);
+}
