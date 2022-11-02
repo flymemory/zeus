@@ -18,7 +18,7 @@ protected:
     FCommandAllocatorManager* TextureStreamingCommandAllocatorManager;
 
     FGlobalHeap GlobalViewHeap;
-}
+};
 
 class FRHICommandList
 {
@@ -33,7 +33,7 @@ public:
     FComputeShaderRHIRef CreateComputeShader();
 
     FGPUFenceRHIRef CreateComputeFence();
-}
+};
 
 class FRHICommandContext
 {
@@ -57,12 +57,12 @@ public:
 
     // Aplly the state cache, and submit the command to command list of device, conditional refresh command list.
     void RHIDrawPrimitive();
-}
+};
 
 class FCommandContext : public FRHICommandContext
 {
     
-} 
+}; 
 
 
 
@@ -73,13 +73,13 @@ class FDefaultBufferAllocator
     {
         // Create a allocator, BuddyAllocator, BucketAllocator, MultiBuddyAllocator
     }
-}
+};
 
 class FResourceAllocator
 {
 
 
-}
+};
 
 // Resources are allocated from buckets, which are just a collection of resources of a particular size.
 class FBucketAllocator : public FResourceAllocator
@@ -98,7 +98,7 @@ protected:
     FThreadSafeQueue<FBlockAllocatorPrivateData> AvailableBlocks[NumBuckets];
     FThreadSafeQueue<FBlockAllocatorPrivateData> ExpiredBlocks;
     TArray<FResource*> SubAllocatedResources;
-}
+};
 
 // Allocates blocks from a fixed range using buddy allocation method.
 // Buddy allocation allows reasonably fast allocation of arbitrary size blocks
@@ -126,7 +126,7 @@ protected:
 
 	TRefCountPtr<FD3D12Resource> BackingResource;
 	TRefCountPtr<FD3D12Heap> BackingHeap;
-}
+};
 
 
 //-----------------------------------------------------------------------------
@@ -162,4 +162,4 @@ protected:
 	const uint32 DefaultPoolSize;
 
 	TArray<FD3D12BuddyAllocator*> Allocators; 
-}
+};
