@@ -37,4 +37,4 @@ public:
         return BufferOut;
     }
     void AllocateBuffer(FDevice *Device, DESC， uint32 Size, uint32 InUsage, uint32 Alignment);
-}
+};

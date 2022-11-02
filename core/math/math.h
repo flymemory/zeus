@@ -1,11 +1,17 @@
 
-#define PI                  3.1415926
-#define INV_PI
-#define HALF_PI
+#include <new>
+#include <wchar.h>
+#include <math.h>
+
+#define PI                  3.1415926535897932f
+#define INV_PI              0.31830988618f
+#define HALF_PI             1.57079632679f
 
 #define FLT_TOLERANCE       (1.e-8f)
 #define FLT_TOLERANCE_SMALL (1.e-4f)
 #define FLT_MAX             (3.402823466e+38F)
+
+#define RND_MAX             0x7fff;
 
 typedef signed char         int8;
 typedef unsigned char       uint8;
@@ -48,12 +54,12 @@ struct FMath
         return floor(F); 
     }
 
-    static inline int FloorToInt()
+    static inline int FloorToInt(float F)
     {
         return TruncToInt(floorf(F));
     }
 
-    static inline float FloorToFloat(float f)
+    static inline float FloorToFloat(float F)
     {
         return floorf(F);
     }
@@ -113,29 +119,29 @@ struct FMath
         return modf(Value, OutInt);
     }
 
-    static inline Exp(float Value)  { return expf(Value); }
-    static inline Exp2(float value) { return powf(2.f, Value); }
-    static inline Loge(float Value) { return Logf(Value); }
-    static inline LogX(float Base, float Value) { return Loge(Value)/Loge(Base); }
-    static inline Log2(float Value) { return loge(Value) * 1.4426950f; }
+    static inline float Exp(float Value)  { return expf(Value); }
+    static inline float Exp2(float Value) { return powf(2.f, Value); }
+    static inline float Loge(float Value) { return logf(Value); }
+    static inline float LogX(float Base, float Value) { return Loge(Value)/Loge(Base); }
+    static inline float Log2(float Value) { return Loge(Value) * 1.4426950f; }
 
-    static inline Sin(float Value)  { return sinf(Value); }
-    static inline Cos(float Vaule)  { return cosf(Value); }
-    static inline Asin(float Value) { return asinf(Value); }
-    static inline Acos(float Value) { return acosf(Value); }
-    static inline Tan(float Value)  { return tanf(Value); }
-    static inline Atan(float Value) { return atanf(Value); }
-    static inline Sqrt(float Value) { return sqrtf(Value); }
-    static inline Pow(float A, float B)  { return powf(A, B); }
+    static inline float Sin(float Value)  { return sinf(Value); }
+    static inline float Cos(float Value)  { return cosf(Value); }
+    static inline float Asin(float Value) { return asinf(Value); }
+    static inline float Acos(float Value) { return acosf(Value); }
+    static inline float Tan(float Value)  { return tanf(Value); }
+    static inline float Atan(float Value) { return atanf(Value); }
+    static inline float Sqrt(float Value) { return sqrtf(Value); }
+    static inline float Pow(float A, float B)  { return powf(A, B); }
 
-    static inline InvSqrt(float F)
+    static inline float InvSqrt(float F)
     {
         return 1.0f / sqrtf(F);
     }
 
-    static void int32 Rand() { return rand(); }
-    static void RandInit(int32 Seed) { srand(Seed); }
-    static float FRand()
+    static inline int32 Rand()              { return rand(); }
+    static inline void RandInit(int32 Seed) { srand(Seed); }
+    static inline float FRand()
     {
         int32 RandMax = 0x00ffffff < RND_MAX ? 0x00ffffff : RND_MAX;
         return (Rand() & RandMax) / (float)RandMax;
@@ -156,19 +162,19 @@ struct FMath
     }
 
     template <class T>
-    static CONSTEXPR inline T Abs(const T A)
+    static constexpr inline T Abs(const T A)
     {
         return (A>=(T)0 ? A : -A);
     }
 
     template <class T>
-    static CONSTEXPR inline T Max(const T A, const T B)
+    static constexpr inline T Max(const T A, const T B)
     {
         return (A>=B) ? A : B;
     }
 
     template <class T>
-    static CONSTEXPR inline T Max(const T A, const T B)
+    static constexpr inline T Max(const T A, const T B)
     {
         return (A<=B) ? A : B;
     }
@@ -193,3 +199,9 @@ struct FMath
 
     static float SmoothStep(float A, float B, float X);
 };
+
+template <>
+inline float FMath::Abs( const float A )
+{
+    return fabsf(A);
+}

@@ -52,7 +52,7 @@ public:
 
 public:
     inline static void MatrixMultipy(FMatrix& Result, const FMatrix& A, const FMatrix& B);
-    inline static void MatrixInverse(FMatrix& Result, const FMatrix& SrcMatrix);
+    inline static void MatrixInverse(FMatrix& Result, FMatrix* SrcMatrix);
     inline static void MatrixTransformVector(FVector4& Result, const FVector4& V, const FMatrix& M);
 };
 
@@ -147,7 +147,7 @@ inline void FMatrix::operator*=(const FMatrix& Other)
     *this = Result;
 }
 
-inline void FMatrix::MatrixInverse(FMatrix& Result, const FMatrix& SrcMatrix)
+inline void FMatrix::MatrixInverse(FMatrix& Result, FMatrix* SrcMatrix)
 {
     FMatrix Result;
 
