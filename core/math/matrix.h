@@ -45,15 +45,22 @@ public:
     inline FVector GetTranslation() const;
     inline void SetTranslation(const FVector& Position);
 
+    inline void SetAxis(int32 Axis, const FVector& AxistVector);
+
     inline FVector GetAxis(int32 Axis);
     inline void GetAxis(FVector& OutXAxis, FVector& OutYAxis, FVector& OutZAxis) const;
-    inline FVector GetAxisNormalized() const;
-    inline void GetAxisNormalized();
+    inline FVector GetAxisNormalized(int32 Axis) const;
+    inline void GetAxisNormalized(FVector& OutXAxis, FVector& OutYAxis, FVector& OutZAxis);
 
 public:
     inline static void MatrixMultipy(FMatrix& Result, const FMatrix& A, const FMatrix& B);
     inline static void MatrixInverse(FMatrix& Result, FMatrix* SrcMatrix);
     inline static void MatrixTransformVector(FVector4& Result, const FVector4& V, const FMatrix& M);
+
+    inline static void MatrixLookAtLH(FMatrix& Result, float eyePos, float lookAt, const FVector& up);
+    inline static void MatrixProjectOrth(FMatrix& Result, float left, float right, float top, float bottom, float near, float far);
+    inline static void MatrixProject(FMatrix& Result, float left, float right, float top, float bottom, float near, float far);
+    inline static void MatrixProject(FMatrix& Result, float fov, float aspect， float near, float far);
 };
 
 inline FMatrix::FMatrix()
@@ -226,4 +233,124 @@ inline FVector4 FMatrix::TransformPosition(const FVector& V) const
 inline FVector4 FMatrix::TransformVector(const FVector& V) const
 {
     return TransformVector(FVector4(V, 0.0f));
+}
+
+void FMatrix::SetAxis(int32 Axis, const FVector& AxisVector)
+{
+    M[Axis][0] = AxisVector.X;
+    M[Axis][1] = AxisVector.X;
+    M[Axis][2] = AxisVector.X;
+    M[Axis][3] = 0;
+}
+
+FVector FMatrix::GetAxis(int32 Axis)
+{
+    FVector Result;
+
+    Result.X = M[Axis][0];
+    Result.Y = M[Axis][1];
+    Result.Z = M[Axis][2];
+
+    return Result;
+}
+
+void FMatrix::GetAxis(FVector& OutXAxis, FVector& OutYAxis, FVector& OutZAxis) const
+{
+    OutXAxis.X = M[0][0]; OutXAxis.Y = M[0][1]; OutXAxis.Z = M[0][2];
+    OutYAxis.X = M[1][0]; OutYAxis.Y = M[1][1]; OutYAxis.Z = M[1][2];
+    OutZAxis.X = M[2][0]; OutZAxis.Y = M[2][1]; OutZAxis.Z = M[2][2];
+}
+
+FVector FMatrix::GetAxisNormalized(int32 Axis) const
+{
+    FVector Result;
+
+    Result.X = M[Axis][0];
+    Result.Y = M[Axis][1];
+    Result.Z = M[Axis][2];
+
+    Result.Normalize();
+
+    return Result;
+}
+
+void FMatrix::GetAxisNormalized(FVector& OutXAxis, FVector& OutYAxis, FVector& OutZAxis))
+{
+    OutXAxis.X = M[0][0]; OutXAxis.Y = M[0][1]; OutXAxis.Z = M[0][2];
+    OutYAxis.X = M[1][0]; OutYAxis.Y = M[1][1]; OutYAxis.Z = M[1][2];
+    OutZAxis.X = M[2][0]; OutZAxis.Y = M[2][1]; OutZAxis.Z = M[2][2];
+
+    OutXAxis.Normalize();
+    OutYAxis.Normalize();
+    OutZAxis.Normalize();
+}
+
+void FMatrix::MatrixLookAtLH(FMatrix& Result, const FVector& eyePos, const FVector& lookAt, const FVector& up)
+{
+    FVector lookDirection = lookAt - eyePos;
+    lookDirection.Normalize();
+
+    FVector rightVector;
+    Vector3CrossProduct(rightVector, lookDirection, up);
+    rightVector.Normalize();
+
+    FVector upVector;
+    Vector3CrossProduct(upVector, lookDirection, rightVector);
+    upVector.Normalize();
+
+    Result.SetIndentity();
+
+    // Transposed of the matrix.
+    //Result.SetAxis(0, rightVector); Result.SetAxis(1, rightVector); Result.SetAxis(2, rightVector);
+    Result.M[0][0] = rightVector.X;     Result.M[1][0] = rightVector.Y;     Result.M[2][0] = rightVector.Z;
+    Result.M[0][1] = upVector.X;        Result.M[1][1] = upVector.Y;        Result.M[2][1] = upVector.Z;
+    Result.M[0][2] = lookDirection.X;   Result.M[1][2] = lookDirection.Y;   Result.M[2][2] = lookDirection.Z;
+
+    // Add the transformed position.
+    Result.M[3][0] = -(rightVector | eyePos);
+    Result.M[3][1] = -(up | eyePos);
+    Result.M[3][2] = -(lookDirection | eyePos);
+}
+
+void FMatrix::MatrixProjectOrth(FMatrix& Result, float left, float right, float top, float bottom, float near, float far)
+{
+    // Move the box to the origin point.
+    FVector CenterPosition;
+    float CenterPosition.X = (right - left) / 2.0f;
+    float CenterPosition.Y = (top - bottom) / 2.0f;
+    float CenterPosition.Z = (far - near) / 2.0f;
+
+    // Transform axis to [-1, 1]
+    float XtoCVV = 2.f / (right - left);
+    float YtoCVV = 2.f / (bottom - up);
+    float ZtoCVV = 2.f / (far - near);
+
+
+    Result.SetIndentity();
+    Result.M[0][0] = XtoCVV;
+    Result.M[1][1] = YtoCVV;
+    Result.M[2][2] = ZtoCVV;
+
+    Result.M[3][0] = -(CenterPosition.X * XtoCVV);
+    Result.M[3][1] = -(CenterPosition.Y * YtoCVV);
+    Result.M[3][2] = -(CenterPosition.Z * ZtoCVV);
+}
+
+void FMatrix::MatrixProject(FMatrix& Result, float left, float right, float top, float bottom, float near, float far)
+{
+    // TODO - Implement it.
+}
+
+void FMatrix::MatrixProject(FMatrix& Result, float fov, float aspect， float near, float far)
+{
+    float CosFOV = FMath::Cos(fov);
+
+    Result.SetIndentity();
+
+    Result.M[0][0] = CosFOV * 0.5f / aspect;
+    Result.M[1][1] = CosFOV * 0.5f;
+    Result.M[2][2] = (near + far) / (near - far);
+    Result.M[2][2] = (2 * near * far) / (near - far);
+    Result.M[3][2] = 1.0f; 
+    Result.M[3][3] = 0.f;
 }
