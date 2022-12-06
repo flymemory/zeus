@@ -3,6 +3,8 @@
 #include <wchar.h>
 #include <math.h>
 
+#pragma once
+
 #define PI                  3.1415926535897932f
 #define INV_PI              0.31830988618f
 #define HALF_PI             1.57079632679f
@@ -11,7 +13,7 @@
 #define FLT_TOLERANCE_SMALL (1.e-4f)
 #define FLT_MAX             (3.402823466e+38F)
 
-#define RND_MAX             0x7fff;
+#define RND_MAX             0x7fff
 
 typedef signed char         int8;
 typedef unsigned char       uint8;
@@ -143,7 +145,7 @@ struct FMath
     static inline void RandInit(int32 Seed) { srand(Seed); }
     static inline float FRand()
     {
-        int32 RandMax = 0x00ffffff < RND_MAX ? 0x00ffffff : RND_MAX;
+        int32 RandMax = (0x00ffffff < RND_MAX) ? 0x00ffffff : RND_MAX;
         return (Rand() & RandMax) / (float)RandMax;
     }
 
@@ -162,7 +164,7 @@ struct FMath
     }
 
     template <class T>
-    static constexpr inline T Abs(const T A)
+    static const inline T Abs(const T A)
     {
         return (A>=(T)0 ? A : -A);
     }
@@ -185,9 +187,9 @@ struct FMath
     {
         return Value < Min ? Min : X < Max ? Value : Max;
     }
-    static inline Wrap();
+    static inline float Wrap();
     
-    static inline Lerp();
+    static inline float Lerp();
 
     static inline void SinCos(float Value, float* OutSin, float* OutCos);
 

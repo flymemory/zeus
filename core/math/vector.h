@@ -1,5 +1,7 @@
 #include "math.h"
 
+#pragma once
+
 struct FVector
  {
     /** X Component of Vector. */

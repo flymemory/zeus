@@ -1,6 +1,8 @@
 
 #include "vector.h"
 
+#pragma once
+
 struct FVector4
 {
     float X;

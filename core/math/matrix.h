@@ -3,6 +3,8 @@
 #include "vector.h"
 #include "vector4.h"
 
+#pragma once
+
 struct FMatrix
 {
     union 
@@ -57,10 +59,10 @@ public:
     inline static void MatrixInverse(FMatrix& Result, FMatrix* SrcMatrix);
     inline static void MatrixTransformVector(FVector4& Result, const FVector4& V, const FMatrix& M);
 
-    inline static void MatrixLookAtLH(FMatrix& Result, float eyePos, float lookAt, const FVector& up);
+    inline static void MatrixLookAtLH(FMatrix& Result, const FVector& eyePos, const FVector& lookAt, const FVector& up);
     inline static void MatrixProjectOrth(FMatrix& Result, float left, float right, float top, float bottom, float near, float far);
     inline static void MatrixProject(FMatrix& Result, float left, float right, float top, float bottom, float near, float far);
-    inline static void MatrixProject(FMatrix& Result, float fov, float aspect， float near, float far);
+    inline static void MatrixProject(FMatrix& Result, float fov, float aspect, float near, float far);
 };
 
 inline FMatrix::FMatrix()
@@ -140,7 +142,7 @@ inline FMatrix FMatrix::operator*(const FMatrix& Other) const
 {
     FMatrix Result;
 
-    FMatrix::MatrixMultipy(&Result, *this, Other);
+    FMatrix::MatrixMultipy(Result, *this, Other);
 
     return Result;
 }
@@ -149,14 +151,14 @@ inline void FMatrix::operator*=(const FMatrix& Other)
 {
     FMatrix Result;
 
-    FMatrix::MatrixMultipy(&Result, *this, Other);
+    FMatrix::MatrixMultipy(Result, *this, Other);
 
     *this = Result;
 }
 
 inline void FMatrix::MatrixInverse(FMatrix& Result, FMatrix* SrcMatrix)
 {
-    FMatrix Result;
+    //FMatrix Result;
 
     typedef float Float4x4[4][4];
     float Det[4];
@@ -274,7 +276,7 @@ FVector FMatrix::GetAxisNormalized(int32 Axis) const
     return Result;
 }
 
-void FMatrix::GetAxisNormalized(FVector& OutXAxis, FVector& OutYAxis, FVector& OutZAxis))
+void FMatrix::GetAxisNormalized(FVector& OutXAxis, FVector& OutYAxis, FVector& OutZAxis)
 {
     OutXAxis.X = M[0][0]; OutXAxis.Y = M[0][1]; OutXAxis.Z = M[0][2];
     OutYAxis.X = M[1][0]; OutYAxis.Y = M[1][1]; OutYAxis.Z = M[1][2];
@@ -291,11 +293,11 @@ void FMatrix::MatrixLookAtLH(FMatrix& Result, const FVector& eyePos, const FVect
     lookDirection.Normalize();
 
     FVector rightVector;
-    Vector3CrossProduct(rightVector, lookDirection, up);
+    rightVector = FVector::CrossProduct(lookDirection, up);
     rightVector.Normalize();
 
     FVector upVector;
-    Vector3CrossProduct(upVector, lookDirection, rightVector);
+    upVector = FVector::CrossProduct(lookDirection, rightVector);
     upVector.Normalize();
 
     Result.SetIndentity();
@@ -316,13 +318,13 @@ void FMatrix::MatrixProjectOrth(FMatrix& Result, float left, float right, float 
 {
     // Move the box to the origin point.
     FVector CenterPosition;
-    float CenterPosition.X = (right - left) / 2.0f;
-    float CenterPosition.Y = (top - bottom) / 2.0f;
-    float CenterPosition.Z = (far - near) / 2.0f;
+    CenterPosition.X = (right - left) / 2.0f;
+    CenterPosition.Y = (top - bottom) / 2.0f;
+    CenterPosition.Z = (far - near) / 2.0f;
 
     // Transform axis to [-1, 1]
     float XtoCVV = 2.f / (right - left);
-    float YtoCVV = 2.f / (bottom - up);
+    float YtoCVV = 2.f / (bottom - top);
     float ZtoCVV = 2.f / (far - near);
 
 
@@ -341,7 +343,7 @@ void FMatrix::MatrixProject(FMatrix& Result, float left, float right, float top,
     // TODO - Implement it.
 }
 
-void FMatrix::MatrixProject(FMatrix& Result, float fov, float aspect， float near, float far)
+void FMatrix::MatrixProject(FMatrix& Result, float fov, float aspect, float near, float far)
 {
     float CosFOV = FMath::Cos(fov);
 
